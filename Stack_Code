@@ -1,0 +1,90 @@
+============================= Wordpress ===============================
+
+---
+version: '3'
+services:
+    Wordpress:
+	  image: wordpress
+	  ports:
+	   - 1111: 80
+	  deploy:
+	    replicas: 3
+    Mydb:
+	  image: mysql5
+      environment:
+        MY_ROOT_PASSWORD: pammi
+      deploy:
+        replicas: 2
+...
+
+
+
+============================= Jenkins =============================
+---
+version: '3'
+services:
+    Devserver:
+       image: jenkins
+       ports:
+        - 5050:8080
+       deploy:
+         replicas: 2
+         placements:
+           constrains:
+            - node.hostname == worker2
+    QAserver:
+       image: tomcat8
+       ports:
+        - 6060:8080
+       deploy:
+         replicas: 2
+         placements:
+           constarins:
+		    - node.hostname == Manager
+    Prodserver:
+       image: tomcat8
+       ports:
+        - 7070:8080
+	   deploy:
+	     replicas: 3
+		 placements:
+           constrains:
+            - node.hostname == worker1
+...
+
+================================ LAMP ==================================
+
+---
+version: '3'
+services:
+    apache:
+	   image: apache2
+	   ports:
+	    - 2222:80
+		deploy:
+		  replicas: 3
+		  resources: 
+		    limits: 
+			  cpu: "0.05"
+			  memory: "150m"
+    mydb_lamp
+	   image: mysql5
+	   environment: 
+	    MY_ROOT_PASSWORD= pammi
+	   deploy: 
+	     replicas: 2
+		 resouces:
+		   limits: 
+		     cpu: "0.06"
+			 memory: "200m"
+    php: 
+	   image: php-7.2
+	   ports:
+	     -3333:80
+	   deploy:
+	      replicas: 4
+		  resources:
+		    limits:
+			   cpu: "0.01"
+			   memory: "75M"
+...
